@@ -1,0 +1,26 @@
+ SetAlarmIntent:
+   confirmationPrompt:
+     maxAttempts: 1
+     messages:
+     - content: Okay, would you like me to schedule your wakeup call for {TimeSlot}?
+       contentType: PlainText
+   description: Going to bed intent
+   name: SetAlarmIntent
+   fulfillmentActivity:
+       type: ReturnIntent
+   rejectionStatement:
+     messages:
+     - content: Okay, no alarm will be set.
+       contentType: PlainText
+   sampleUtterances:
+   - Set my alarm.
+   slots:
+     - name: TimeSlot
+       slotType: AMAZON.TIME
+       slotConstraint: Required
+       valueElicitationPrompt:
+         messages:
+         - content: What time do you want me to wake you up?
+           contentType: PlainText
+         maxAttempts: 3
+
