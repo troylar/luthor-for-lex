@@ -10,6 +10,7 @@ moto = "*"
 speechrecognition = "*"
 click = "*"
 pygame = "*"
+twine = "*"
 
 [dev-packages]
 
