@@ -10,11 +10,20 @@
 # and limitations under the License.
 
 import boto3
-import pygame
 from contextlib import closing
 import tempfile
 import os
 import logging
+import sys
+with open(os.devnull, 'w') as f:
+    # disable stdout
+    oldstdout = sys.stdout
+    sys.stdout = f
+
+    import pygame
+
+    # enable stdout
+    sys.stdout = oldstdout
 
 
 class Speaker(object):

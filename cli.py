@@ -83,4 +83,4 @@ def lex_play(bot_names, alias, username, voice_id, no_audio, ice_breaker,
         lp.get_user_input()
 
 if __name__ == '__main__':
-    cli()
+    main()
