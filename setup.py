@@ -8,7 +8,7 @@ with open('requirements.txt') as f:
 
 setuptools.setup(
     name="luthor-for-lex",
-    version="0.0.2",
+    version="0.0.3",
     author="Troy Larson",
     author_email="troylar@gmail.com",
     description="Easy Lex bot manager",
@@ -16,7 +16,7 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     url="https://github.com/troylar/luthor-for-lex",
     install_required=required,
-    packages=["speaker", "lex"],
+    packages=["speaker", "lex", "cli"],
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
