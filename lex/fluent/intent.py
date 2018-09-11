@@ -17,6 +17,25 @@ class FulfillmentActivity:
         self.type = kwargs.get('Type')
         self.code_hook = kwargs.get('CodeHook')
 
+    def with_code_hook(self, code_hook):
+        self.code_hook = code_hook
+        return self
+
+    def with_type(self, type):
+        self.type = type
+        return self
+
+    def to_dict(self):
+        data = {}
+        data['codeHook'] = self.code_hook.to_dict()
+        data['type'] = self.type
+        return data
+
+
+class ConclusionStatement(WithMessage):
+    def __init__(self, **kwargs):
+        super(ConclusionStatement, self).__init__(**kwargs)
+        self.key = 'conclusionStatement'
 
 class ConfirmationPrompt(WithMessage):
     def __init__(self, **kwargs):
@@ -37,10 +56,26 @@ class Prompt(WithMessage):
         self.key = 'prompt'
 
 
-class FollowUpPrompt(WithMessage):
+class FollowUpPrompt:
     def __init__(self, **kwargs):
-        super(FollowUpPrompt, self).__init__(**kwargs)
-        self.key = 'followUpPrompt'
+        self.prompt = kwargs.get('Prompt')
+        self.rejection_statement = kwargs.get('RejectionStatement')
+
+    def with_prompt(self, prompt):
+        self.prompt = prompt
+        return self
+
+    def with_rejection_statement(self, rejection_statement):
+        self.rejection_statement = rejection_statement
+        return self
+
+    def to_dict(self):
+        data = {}
+        if self.prompt:
+            data['prompt'] = self.prompt.to_dict()
+        if self.rejection_statement:
+            data['rejection_statement'] = self.rejection_statement.to_dict()
+        return data
 
 
 class IntentSlot(WithMessage):
@@ -118,12 +153,15 @@ class Intent:
         self.synonyms = kwargs.get('Synonyms')
         self.confirmation_prompt = kwargs.get('ConfirmationPrompt', {})
         self.rejection_statement = kwargs.get('RejectionStatement', {})
+        self.conclusion_statement = kwargs.get('ConclusionStatement', {})
         self.follow_up_prompt = kwargs.get('FollowUpPrompt', {})
         self.parentIntentSignature = kwargs.get('ParentIntentSignature')
         self.checksum = kwargs.get('Checksum')
         self.create_version = kwargs.get('CreateVersion', False)
         self.slots = kwargs.get('Slots', [])
         self.dialog_hook = kwargs.get('DialogHook')
+        self.fulfillment_activity = kwargs.get('FulfillmentActivity', {})
+        self.sample_utterances = kwargs.get('SampleUtterances', [])
 
     def with_name(self, name):
         self.name = name
@@ -177,10 +215,39 @@ class Intent:
         self.slots.append(slot.to_json())
         return self
 
+    def with_sample_utterances(self, sample_utterance):
+        self.sample_utterances.append(sample_utterance)
+        return self
+
+    def with_fulfillment_activity(self, fulfillment_activity):
+        self.fulfillment_activity = fulfillment_activity
+        return self
+
     def to_json(self):
         intent_j = {"name": self.name}
         if self.description:
             intent_j['description'] = self.description
+        if self.sample_utterances:
+            intent_j['sampleUtterances'] = self.sample_utterances
+        if self.slots:
+            intent_j['slots'] = self.slots
+        if self.rejection_statement:
+            intent_j['rejectionStatement'] = self.rejection_statement.to_dict()
+        if self.confirmation_prompt:
+            intent_j['confirmationPrompt'] = self.confirmation_prompt.to_dict()
+        if self.conclusion_statement:
+            intent_j['conclusionStatement'] = self.conclusion_statement.to_dict()
+        if self.fulfillment_activity:
+            intent_j['fulfillmentActivity'] = self.fulfillment_activity.to_dict()
+        if self.follow_up_prompt:
+            intent_j['followUpPrompt'] = self.follow_up_prompt.to_dict()
+        if self.dialog_hook:
+            intent_j['dialogCookHook'] = self.dialog_hook.to_dict()
+        return intent_j
+
+    def apply(self):
+        client = boto3.client('lex-models')
+        client.put_intent(**self.to_json())
         if self.slots:
             intent_j['slots'] = self.slots
         if self.dialog_hook:
