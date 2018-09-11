@@ -11,6 +11,11 @@ speechrecognition = "*"
 click = "*"
 pygame = "*"
 twine = "*"
+"jinja2" = "*"
+luthor-for-lex = {editable = true, path = "."}
+pytest = "*"
+sure = "*"
+coverage = "*"
 
 [dev-packages]
 
