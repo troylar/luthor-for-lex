@@ -1,7 +1,8 @@
 import json
 from lex.fluent.intent import Intent, DialogHookCode, ConfirmationPrompt, \
                               RejectionStatement, Prompt, FollowUpPrompt, \
-                              ConclusionStatement, FulfillmentActivity
+                              ConclusionStatement, FulfillmentActivity, \
+                              IntentSlot
 from lex.fluent.slot import Slot, EnumerationValue
 from utils import DictUtils
 import unittest
@@ -107,3 +108,10 @@ class TestCase(unittest.TestCase):
         f.with_type('ReturnIntent')
         i.with_fulfillment_activity(f)
         assert DictUtils.are_same(i.to_json(), correct_j)
+
+    def test_can_pass_slot_to_intent_slot(self):
+        s = Slot(Name='testslot', Description='testdescript')
+        intent_slot = IntentSlot(Slot=s)
+        print(intent_slot.name)
+        assert intent_slot.description == 'testdescript'
+        assert intent_slot.name == 'testslot'

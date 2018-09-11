@@ -1,5 +1,6 @@
-import boto3
 from lex.fluent.message import WithMessage
+from lex.fluent.slot import Slot
+from lex import LexIntentManager
 
 
 class DialogHookCode:
@@ -78,19 +79,27 @@ class FollowUpPrompt:
         return data
 
 
-class IntentSlot(WithMessage):
+class IntentSlot(Slot):
+    def __new__(cls, **kwargs):
+        if kwargs.get('Slot'):
+            s = kwargs.get('Slot')
+            s.__class__ = IntentSlot
+            return s
+
     def __init__(self, **kwargs):
-        self.name = kwargs.get('Name')
-        self.description = kwargs.get('Description')
+        if 'name' not in self.__dict__.keys():
+            self.name = kargs.get('Name')
+        if 'description' not in self.__dict__.keys():
+            self.description = kwargs.get('Description')
         self.slot_constraint = kwargs.get('SlotConstraint')
-        self.slot_type = kwargs.get('SlotType')
+        if 'slot_type' not in self.__dict__.keys():
+            self.slot_type = kwargs.get('SlotType')
         self.slot_type_version = kwargs.get('SlotTypeVersion')
         self.value_elicitation_prompt = {"messages": []}
         self.max_attempts = kwargs.get('PromptMaxAttempts', 3)
         self.priority = kwargs.get('Priority')
         self.sample_utterances = kwargs.get('SampleUtterances')
         self.response_card = kwargs.get('ResponseCard')
-        super(IntentSlot, self).__init__(**kwargs)
 
     def with_name(self, name):
         self.name = name
@@ -162,6 +171,7 @@ class Intent:
         self.dialog_hook = kwargs.get('DialogHook')
         self.fulfillment_activity = kwargs.get('FulfillmentActivity', {})
         self.sample_utterances = kwargs.get('SampleUtterances', [])
+        self.intent_manager = LexIntentManager()
 
     def with_name(self, name):
         self.name = name
@@ -246,14 +256,5 @@ class Intent:
         return intent_j
 
     def apply(self):
-        client = boto3.client('lex-models')
-        client.put_intent(**self.to_json())
-        if self.slots:
-            intent_j['slots'] = self.slots
-        if self.dialog_hook:
-            intent_j['dialogCookHook'] = self.dialog_hook.to_dict()
-        return intent_j
-
-    def apply(self):
-        client = boto3.client('lex-models')
-        client.put_intent(**self.to_json())
+        self.intent_manager.upsert(self.to_json())
+        return self

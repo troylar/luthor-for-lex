@@ -1,5 +1,4 @@
-import boto3
-
+from lex import LexSlotManager
 
 class EnumerationValue:
     def __init__(self, **kwargs):
@@ -16,6 +15,7 @@ class Slot:
         self.create_version = kwargs.get('CreateVersion', False)
         self.value_selection_strategy = kwargs.get('ValueSelectionStrategy', 'ORIGINAL_VALUE')
         self.enumeration_values = kwargs.get('EnumerationValues', [])
+        self.slot_manager = LexSlotManager()
 
     def with_name(self, name):
         self.name = name
@@ -59,5 +59,5 @@ class Slot:
         return slot_j
 
     def apply(self):
-        client = boto3.client('lex-models')
-        client.put_slot_type(**self.to_json())
+        self.slot_manager.upsert(self.to_json())
+        return self
