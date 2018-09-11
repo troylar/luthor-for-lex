@@ -122,6 +122,8 @@ class Intent:
         self.parentIntentSignature = kwargs.get('ParentIntentSignature')
         self.checksum = kwargs.get('Checksum')
         self.create_version = kwargs.get('CreateVersion', False)
+        self.slots = kwargs.get('Slots', [])
+        self.dialog_hook = kwargs.get('DialogHook')
 
     def with_name(self, name):
         self.name = name
@@ -171,10 +173,16 @@ class Intent:
         self.dialog_hook = dialog_hook
         return self
 
+    def with_slot(self, slot):
+        self.slots.append(slot.to_json())
+        return self
+
     def to_json(self):
         intent_j = {"name": self.name}
         if self.description:
             intent_j['description'] = self.description
+        if self.slots:
+            intent_j['slots'] = self.slots
         if self.dialog_hook:
             intent_j['dialogCookHook'] = self.dialog_hook.to_dict()
         return intent_j
