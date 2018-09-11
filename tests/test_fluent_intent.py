@@ -111,7 +111,7 @@ class TestCase(unittest.TestCase):
 
     def test_can_pass_slot_to_intent_slot(self):
         s = Slot(Name='testslot', Description='testdescript')
-        intent_slot = IntentSlot(Slot=s)
-        print(intent_slot.name)
+        intent_slot = IntentSlot(Slot=s).with_slot_constraint('Required')
         assert intent_slot.description == 'testdescript'
         assert intent_slot.name == 'testslot'
+        assert intent_slot.slot_constraint == 'Required'

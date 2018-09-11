@@ -47,9 +47,11 @@ class Slot:
         return self
 
     def to_json(self):
-        slot_j = {"name": self.name,
-                  "createVersion": self.create_version,
-                  "valueSelectionStrategy": self.value_selection_strategy}
+        slot_j = {"name": self.name}
+        if self.create_version:
+            slot_j['createVersion'] = self.create_version
+        if self.value_selection_strategy:
+            slot_j['valueSelectionStrategy'] = self.value_selection_strategy
         if self.description:
             slot_j['description'] = self.description
         if self.enumeration_values:

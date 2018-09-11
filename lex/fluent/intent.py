@@ -91,9 +91,12 @@ class IntentSlot(Slot):
             self.name = kargs.get('Name')
         if 'description' not in self.__dict__.keys():
             self.description = kwargs.get('Description')
-        self.slot_constraint = kwargs.get('SlotConstraint')
+        if 'slot_constraint' not in self.__dict__.keys():
+            self.slot_constraint = kwargs.get('SlotConstraint')
         if 'slot_type' not in self.__dict__.keys():
             self.slot_type = kwargs.get('SlotType')
+        if 'create_version' in self.__dict__:
+            del self.__dict__['create_version']
         self.slot_type_version = kwargs.get('SlotTypeVersion')
         self.value_elicitation_prompt = {"messages": []}
         self.max_attempts = kwargs.get('PromptMaxAttempts', 3)
@@ -150,6 +153,14 @@ class IntentSlot(Slot):
         self.value_elicitation_prompt['responseCard'] = response_card
         return self
 
+    def to_dict(self):
+        data = {}
+        data['name'] = self.name
+        data['description'] = self.description
+        data['slotConstraint'] = self.slot_constraint
+        data['slotType'] = self.slot_type
+        return data
+
 
 class Intent:
     def __init__(self, **kwargs):
@@ -166,7 +177,6 @@ class Intent:
         self.follow_up_prompt = kwargs.get('FollowUpPrompt', {})
         self.parentIntentSignature = kwargs.get('ParentIntentSignature')
         self.checksum = kwargs.get('Checksum')
-        self.create_version = kwargs.get('CreateVersion', False)
         self.slots = kwargs.get('Slots', [])
         self.dialog_hook = kwargs.get('DialogHook')
         self.fulfillment_activity = kwargs.get('FulfillmentActivity', {})
@@ -222,7 +232,7 @@ class Intent:
         return self
 
     def with_slot(self, slot):
-        self.slots.append(slot.to_json())
+        self.slots.append(IntentSlot(Slot=slot).to_dict())
         return self
 
     def with_sample_utterances(self, sample_utterance):
