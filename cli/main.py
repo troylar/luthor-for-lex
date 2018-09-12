@@ -1,5 +1,7 @@
 import click
 from lex import LexBotManager, LexIntentManager, LexSlotManager, LexPlayer
+from lex.fluent.intent import Intent
+from lex.fluent.slot import Slot, EnumerationValue
 import os
 
 @click.group()
@@ -44,6 +46,15 @@ def apply_intents(config_path):
         intent = im.upsert(intent)
         im.create_version(intent)
 
+@lex_intent.command('get')
+@click.argument('name')
+@click.option('--version', default='$LATEST')
+def get_intent(name, version):
+    sm = LexIntentManager()
+    intent_j = sm.get_intent(Name=name, Version=version)
+    intent = Intent.from_json(intent_j)
+    print(intent.to_json())
+
 
 @lex_slot_type.command('apply')
 @click.argument('config_path')
@@ -54,6 +65,15 @@ def apply_slots(config_path):
         slot = slots[i]
         slot = sm.upsert(slot)
         sm.create_version(slot)
+
+@lex_slot_type.command('get')
+@click.argument('name')
+@click.option('--version', default='$LATEST')
+def get_slot(name, version):
+    sm = LexSlotManager()
+    slot_type_j = sm.get_slot_type(Name=name, Version=version)
+    slot_type = Slot.from_json(slot_type_j)
+    print(slot_type)
 
 
 @cli.command('play')
@@ -83,4 +103,4 @@ def lex_play(bot_names, alias, username, voice_id, no_audio, ice_breaker,
         lp.get_user_input()
 
 if __name__ == '__main__':
-    main()
+    cli()

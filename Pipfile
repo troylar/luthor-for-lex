@@ -16,6 +16,7 @@ luthor-for-lex = {editable = true, path = "."}
 pytest = "*"
 sure = "*"
 coverage = "*"
+"flake8" = "*"
 
 [dev-packages]
 

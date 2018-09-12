@@ -32,5 +32,14 @@ class WithMessage:
         self.messages.append(self._to_message(content_type, content, group_number))
         return self
 
-
-
+    @staticmethod
+    def from_json(message_j):
+        w = WithMessage()
+        if 'maxAttempts' in message_j.keys():
+            w.with_max_attempts(message_j['maxAttempts'])
+        if 'responseCard' in message_j.keys():
+            w.with_response_card(message_j['responseCard'])
+        if 'messages' in message_j.keys():
+            for msg in message_j['messages']:
+                w.with_message(msg['contentType'], msg['content'], msg['groupNumber'])
+        return w

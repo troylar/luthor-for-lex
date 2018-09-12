@@ -31,7 +31,7 @@ class LexSlotManager:
         try:
             s = self.client.get_slot_type(
                 name=kwargs.get('Name'),
-                version=kwargs.get('Version', '$ALIAS'))
+                version=kwargs.get('Version', '$LATEST'))
             return s
 
         except ClientError as e:
@@ -88,9 +88,11 @@ class LexIntentManager:
                 intents.update(yaml.load(stream))
         return intents
 
-    def get_intent(self, intentName, version):
+    def get_intent(self, **kwargs):
         try:
-            i = self.client.get_intent(name=intentName, version=version)
+            i = self.client.get_intent(
+                name=kwargs.get('Name'),
+                version=kwargs.get('Version'))
             return i
 
         except ClientError as e:

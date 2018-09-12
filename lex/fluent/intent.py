@@ -3,7 +3,7 @@ from lex.fluent.slot import Slot
 from lex import LexIntentManager
 
 
-class DialogHookCode:
+class DialogCodeHook:
     def __init__(self, **kwargs):
         self.data = {}
         self.data['uri'] = kwargs.get('Uri')
@@ -37,6 +37,7 @@ class ConclusionStatement(WithMessage):
     def __init__(self, **kwargs):
         super(ConclusionStatement, self).__init__(**kwargs)
         self.key = 'conclusionStatement'
+
 
 class ConfirmationPrompt(WithMessage):
     def __init__(self, **kwargs):
@@ -88,7 +89,7 @@ class IntentSlot(Slot):
 
     def __init__(self, **kwargs):
         if 'name' not in self.__dict__.keys():
-            self.name = kargs.get('Name')
+            self.name = kwargs.get('Name')
         if 'description' not in self.__dict__.keys():
             self.description = kwargs.get('Description')
         if 'slot_constraint' not in self.__dict__.keys():
@@ -231,6 +232,10 @@ class Intent:
         self.dialog_hook = dialog_hook
         return self
 
+    def with_intent_slot(self, slot):
+        self.slots.append(slot)
+        return self
+
     def with_slot(self, slot):
         self.slots.append(IntentSlot(Slot=slot).to_dict())
         return self
@@ -262,8 +267,57 @@ class Intent:
         if self.follow_up_prompt:
             intent_j['followUpPrompt'] = self.follow_up_prompt.to_dict()
         if self.dialog_hook:
-            intent_j['dialogCookHook'] = self.dialog_hook.to_dict()
+            intent_j['dialogCodeHook'] = self.dialog_hook.to_dict()
         return intent_j
+
+    def from_json(intent_j):
+        intent = Intent()
+        if 'name' in intent_j.keys():
+            intent.with_name(intent_j['name'])
+        if 'checksum' in intent_j.keys():
+            intent.with_checksum(intent_j['checksum'])
+        if 'description' in intent_j.keys():
+            intent.with_description(intent_j['description'])
+        if 'sampleUtterances' in intent_j.keys():
+            for u in intent_j['sampleUtterances']:
+                intent.with_sample_utterance(u)
+        if 'slots' in intent_j.keys():
+            for s in intent_j['slots']:
+                intent.with_intent_slot(s)
+        if 'dialogCodeHook' in intent_j.keys():
+            d = intent_j['dialogCodeHook']
+            intent.with_code_hook(DialogCodeHook(Uri=d['uri'],
+                                                 MessageVersion=d['messageVersion']))
+        if 'rejectionStatement' in intent_j.keys():
+            r = WithMessage.from_json(intent_j['rejectionStatment'])
+            intent.with_rejection_statement(r)
+
+        if 'conclusionStatement' in intent_j.keys():
+            c = WithMessage.from_json(intent_j['conclusionStatement'])
+            intent.with_confirmation_prompt(c)
+
+        if 'confirmationPrompt' in intent_j.keys():
+            c = WithMessage.from_json(intent_j['confirmationPrompt'])
+            intent.with_confirmation_prompt(c)
+
+        if 'followUpPrompt' in intent_j.keys():
+            f = FollowUpPrompt()
+            if 'rejectionStatement' in intent_j['followUpPrompt']:
+                r = WithMessage.from_json(intent_j['followUpPrompt']['rejectionStatment'])
+                f.with_rejection_statment(r)
+            if 'prompt' in intent_j['followUpPrompt']:
+                p = WithMessage.from_json(intent_j['followUpPrompt']['prompt'])
+                f.with_prompt(p)
+            intent.with_follow_up_prompt(f)
+
+        if 'fulfillmentActivity' in intent_j.keys():
+            f = FulfillmentActivity()
+            d = intent_j['fulfillmentActivity']['dialogCodeHook']
+            f.with_code_hook(DialogCodeHook(Uri=d['uri'],
+                                            MessageVersion=d['messageVersion']))
+            f.with_type(intent_j['fulfillmentActivity']['type'])
+            intent.with_fulfillment_activity(f)
+        return intent
 
     def apply(self):
         self.intent_manager.upsert(self.to_json())

@@ -1,4 +1,15 @@
 from lex import LexSlotManager
+import json
+from collections import namedtuple
+
+import json
+
+class Generic:
+    @classmethod
+    def from_dict(cls, dict):
+        obj = cls()
+        obj.__dict__.update(dict)
+        return obj
 
 class EnumerationValue:
     def __init__(self, **kwargs):
@@ -59,6 +70,25 @@ class Slot:
         if self.checksum:
             slot_j['checksum'] = self.checksum
         return slot_j
+
+    @staticmethod
+    def from_json(slot_j):
+        s = Slot()
+        if 'name' in slot_j.keys():
+            s.with_name(slot_j['name'])
+        if 'description' in slot_j.keys():
+            s.with_description(slot_j['description'])
+        if 'checksum' in slot_j.keys():
+            s.with_checksum(slot_j['checksum'])
+        if 'createVersion' in slot_j.keys():
+            s.with_create_version(slot_j['createVersion'])
+        if 'valueSelectionStrategy' in slot_j.keys():
+            s.with_value_selection_strategy(slot_j['valueSelectionStrategy'])
+        if 'enumerationValues' in slot_j.keys():
+            for v in slot_j['enumerationValues']:
+                s.enumeration_values.append(EnumerationValue(Value=v['value'],
+                                                                Synonyms=v['synonyms']))
+        return s
 
     def apply(self):
         self.slot_manager.upsert(self.to_json())
