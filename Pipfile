@@ -18,6 +18,7 @@ sure = "*"
 coverage = "*"
 "flake8" = "*"
 "zest.releaser" = "*"
+setuptools-git = "*"
 
 [dev-packages]
 
