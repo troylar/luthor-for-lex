@@ -136,10 +136,8 @@ class LexIntentManager:
                             i['slotTypeVersion'] = latestVersion
         print('Upserting intent: {}'.format(intent['name']))
         current_intent = self.get_intent(
-            intent['name'],
-            '$LATEST'
-
-        )
+            Name=intent['name'],
+            Version='$LATEST')
         if current_intent:
             args['checksum'] = current_intent['checksum']
         return self.client.put_intent(**args)
