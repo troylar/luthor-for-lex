@@ -322,3 +322,7 @@ class Intent:
     def apply(self):
         self.intent_manager.upsert(self.to_json())
         return self
+
+    def get(self):
+        intent_j = self.intent_manager.get_intent(Name=self.name, Version=self.version)
+        return Intent.from_json(intent_j)

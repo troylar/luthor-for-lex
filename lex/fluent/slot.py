@@ -23,6 +23,7 @@ class Slot:
         self.description = kwargs.get('Description')
         self.checksum = kwargs.get('Checksum')
         self.value = kwargs.get('Value')
+        self.version = kwargs.get('Version', '$LATEST')
         self.create_version = kwargs.get('CreateVersion', False)
         self.value_selection_strategy = kwargs.get('ValueSelectionStrategy', 'ORIGINAL_VALUE')
         self.enumeration_values = kwargs.get('EnumerationValues', [])
@@ -38,6 +39,10 @@ class Slot:
 
     def with_checksum(self, checksum):
         self.checksum = checksum
+        return self
+
+    def with_version(self, version):
+        self.version = version
         return self
 
     def with_value(self, value):
@@ -80,6 +85,8 @@ class Slot:
             s.with_description(slot_j['description'])
         if 'checksum' in slot_j.keys():
             s.with_checksum(slot_j['checksum'])
+        if 'version' in slot_j.keys():
+            s.with_checksum(slot_j['version'])
         if 'createVersion' in slot_j.keys():
             s.with_create_version(slot_j['createVersion'])
         if 'valueSelectionStrategy' in slot_j.keys():
@@ -87,9 +94,13 @@ class Slot:
         if 'enumerationValues' in slot_j.keys():
             for v in slot_j['enumerationValues']:
                 s.enumeration_values.append(EnumerationValue(Value=v['value'],
-                                                                Synonyms=v['synonyms']))
+                                                             Synonyms=v['synonyms']))
         return s
 
     def apply(self):
         self.slot_manager.upsert(self.to_json())
         return self
+
+    def get(self):
+        slot_j = self.slot_manager.get_slot_type(Name=self.name, Version=self.version)
+        return Slot.from_json(slot_j)
