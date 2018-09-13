@@ -53,3 +53,4 @@ websocket-client==0.51.0
 Werkzeug==0.14.1
 wrapt==1.10.11
 xmltodict==0.11.0
+zest.releaser==6.15.2
