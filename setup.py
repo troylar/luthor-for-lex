@@ -15,7 +15,6 @@ setuptools.setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/troylar/luthor-for-lex",
-    install_required=required,
     packages=["speaker", "lex", "cli", "lex.fluent"],
     classifiers=[
         "Programming Language :: Python :: 3",
