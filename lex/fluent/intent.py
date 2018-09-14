@@ -28,7 +28,8 @@ class FulfillmentActivity:
 
     def to_dict(self):
         data = {}
-        data['codeHook'] = self.code_hook.to_dict()
+        if 'codeHook' in data.keys():
+            data['codeHook'] = self.code_hook.to_dict()
         data['type'] = self.type
         return data
 
@@ -81,29 +82,38 @@ class FollowUpPrompt:
 
 
 class IntentSlot(Slot):
-    def __new__(cls, **kwargs):
+    def __new__(cls, *args, **kwargs):
         if kwargs.get('Slot'):
             s = kwargs.get('Slot')
             s.__class__ = IntentSlot
             return s
+        super_new = super(Slot, cls).__new__
+        if super_new is object.__new__:
+            return super_new(cls)
 
     def __init__(self, **kwargs):
         if 'name' not in self.__dict__.keys():
             self.name = kwargs.get('Name')
         if 'description' not in self.__dict__.keys():
             self.description = kwargs.get('Description')
+        if 'slot_type_version' not in self.__dict__.keys():
+            self.slot_type_version = kwargs.get('SlotTypeVersion', '$LATEST')
         if 'slot_constraint' not in self.__dict__.keys():
             self.slot_constraint = kwargs.get('SlotConstraint')
         if 'slot_type' not in self.__dict__.keys():
-            self.slot_type = kwargs.get('SlotType')
+            self.slot_type = kwargs.get('slot_type', self.name)
         if 'create_version' in self.__dict__:
             del self.__dict__['create_version']
-        self.slot_type_version = kwargs.get('SlotTypeVersion')
-        self.value_elicitation_prompt = {"messages": []}
-        self.max_attempts = kwargs.get('PromptMaxAttempts', 3)
-        self.priority = kwargs.get('Priority')
-        self.sample_utterances = kwargs.get('SampleUtterances')
-        self.response_card = kwargs.get('ResponseCard')
+        if 'value_elicitation_prompt' not in self.__dict__.keys():
+            self.value_elicitation_prompt = {"messages": []}
+        if 'max_attempts' not in self.__dict__.keys():
+            self.max_attempts = kwargs.get('PromptMaxAttempts', 3)
+        if 'priority' not in self.__dict__.keys():
+            self.priority = kwargs.get('Priority')
+        if 'sample_utterances' not in self.__dict__.keys():
+            self.sample_utterances = kwargs.get('SampleUtterances')
+        if 'response_card' not in self.__dict__.keys():
+            self.response_card = kwargs.get('ResponseCard')
 
     def with_name(self, name):
         self.name = name
@@ -141,17 +151,20 @@ class IntentSlot(Slot):
         self.response_card = response_card
         return self
 
-    def with_value_elicitation_prompt_message(self, content_type, content, group_number):
-        self.value_elicitation_prompt['messages'].append(
-           self._to_message(content_type, content, group_number))
+    def with_value_elicitation_prompt_message(self, content_type, content, group_number=None):
+        data = {'contentType': content_type,
+                'content': content}
+        if group_number:
+            data['groupNumber'] = group_number
+        self.value_elicitation_prompt['messages'].append(data)
         return self
 
     def with_prompt_max_attempts(self, max_attempts):
-        self.value_elicitation_prompt['maxAttempts'] = max_attempts
+        self.max_attempts = max_attempts
         return self
 
     def with_prompt_response_card(self, response_card):
-        self.value_elicitation_prompt['responseCard'] = response_card
+        self.response_card = response_card
         return self
 
     def to_dict(self):
@@ -160,6 +173,22 @@ class IntentSlot(Slot):
         data['description'] = self.description
         data['slotConstraint'] = self.slot_constraint
         data['slotType'] = self.slot_type
+        if not self.slot_type.startswith('AMAZON.'):
+            data['slotTypeVersion'] = self.slot_type_version
+        if self.priority:
+            data['priority'] = self.priority
+        if self.response_card:
+            data['responseCard'] = self.response_card
+        if self.sample_utterances:
+            data['sampleUtterances'] = self.sample_utterances
+        if self.value_elicitation_prompt:
+            data['valueElicitationPrompt'] = {}
+            if self.max_attempts:
+                data['valueElicitationPrompt']['maxAttempts'] = self.max_attempts
+            if self.response_card:
+                data['valueElicitationPrompt']['responseCard'] = self.response_card
+            if 'messages' in self.value_elicitation_prompt:
+                data['valueElicitationPrompt']['messages'] = self.value_elicitation_prompt['messages']
         return data
 
 
@@ -182,6 +211,7 @@ class Intent:
         self.dialog_hook = kwargs.get('DialogHook')
         self.fulfillment_activity = kwargs.get('FulfillmentActivity', {})
         self.sample_utterances = kwargs.get('SampleUtterances', [])
+        self.version = kwargs.get('Version', '$LATEST')
         self.intent_manager = LexIntentManager()
 
     def with_name(self, name):
@@ -194,10 +224,6 @@ class Intent:
 
     def with_checksum(self, checksum):
         self.checksum = checksum
-        return self
-
-    def with_value(self, value):
-        self.value = value
         return self
 
     def with_synonyms(self, synonyms):
@@ -226,6 +252,10 @@ class Intent:
 
     def with_conclusion_statement(self, conclusion_statement):
         self.conclusion_statement = conclusion_statement
+        return self
+
+    def with_version(self, version):
+        self.version = version
         return self
 
     def with_dialog_hook(self, dialog_hook):
@@ -280,7 +310,7 @@ class Intent:
             intent.with_description(intent_j['description'])
         if 'sampleUtterances' in intent_j.keys():
             for u in intent_j['sampleUtterances']:
-                intent.with_sample_utterance(u)
+                intent.with_sample_utterances(u)
         if 'slots' in intent_j.keys():
             for s in intent_j['slots']:
                 intent.with_intent_slot(s)
@@ -312,16 +342,21 @@ class Intent:
 
         if 'fulfillmentActivity' in intent_j.keys():
             f = FulfillmentActivity()
-            d = intent_j['fulfillmentActivity']['dialogCodeHook']
-            f.with_code_hook(DialogCodeHook(Uri=d['uri'],
-                                            MessageVersion=d['messageVersion']))
             f.with_type(intent_j['fulfillmentActivity']['type'])
+            if 'dialogCodeHook' in intent_j['fulfillmentActivity']:
+                d = intent_j['fulfillmentActivity']['dialogCodeHook']
+                f.with_code_hook(DialogCodeHook(Uri=d['uri'],
+                                 MessageVersion=d['messageVersion']))
             intent.with_fulfillment_activity(f)
+
+        if 'version' in intent_j.keys():
+            intent.with_version(intent_j['version'])
         return intent
 
     def apply(self):
+        print(self.to_json())
         self.intent_manager.upsert(self.to_json())
-        return self
+        return self.get()
 
     def get(self):
         intent_j = self.intent_manager.get_intent(Name=self.name, Version=self.version)

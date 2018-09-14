@@ -74,6 +74,8 @@ class Slot:
             slot_j['enumerationValues'] = self.enumeration_values
         if self.checksum:
             slot_j['checksum'] = self.checksum
+        if slot_j['slotType'].startswith('AMAZON.') and 'version' in slot_j.keys():
+            del slot_j['version']
         return slot_j
 
     @staticmethod

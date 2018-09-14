@@ -1,5 +1,6 @@
 import boto3
-from lex.message import WithMessage
+from lex.fluent.message import WithMessage
+from lex import LexBotManager
 
 
 class AbortStatement(WithMessage):
@@ -29,6 +30,14 @@ class Bot:
         self.locale = kwargs.get('Locale', 'en-US')
         self.childDirected = kwargs.get('ChildDirected', False)
         self.createVersion = kwargs.get('CreateVersion', False)
+        self.abort_statement = kwargs.get('AbortStatement')
+        self.abort_statement = kwargs.get('AbortStatement',
+            AbortStatement(MaxAttempts=3).with_message('PlainText', 'Sorry, I couldn\'t understand.'))
+        self.clarification_prompt = kwargs.get('ClarificationPrompt',
+            ClarificationPrompt(MaxAttempts=3).with_message('PlainText', 'Sorry, could you please repeat that?'))
+        self.locale = kwargs.get('Locale', 'en-US')
+        self.child_directed = kwargs.get('ChildDirected', False)
+        self.bot_manager = LexBotManager()
 
     def with_name(self, name):
         self.name = name
@@ -58,17 +67,33 @@ class Bot:
         self.value_selection_strategy = strategy
         return self
 
-    def
+    def with_abort_statement(self, abort_statement):
+        self.abort_statement = abort_statement
+        return self
+
+    def with_clarification_prompt(self, clarification_prompt):
+        self.clarification_prompt = clarification_prompt
+        return self
+
+    def with_intent(self, intent):
+        self.intents.append(intent)
+        return self
 
     def apply(self):
-        client = boto3.client('lex-models')
-        slot_j = { "name": self.name,
-                   "enumerationValues": [ { "value": self.value } ],
-                   "valueSelectionStrategy": self.value_selection_strategy}
+        bot_j = {}
+        if self.name:
+            bot_j['name'] = self.name
         if self.description:
-            slot_j['description'] = self.description
-        if self.synonyms:
-            slot_j['enumerationValues']['synonyms'] = self.synonyms
-        if self.checksum:
-            slot_j['checksum'] = self.checksum
-        client.put_slot_type(**slot_j)
+            bot_j['description'] = self.description
+        if self.intents:
+            bot_j['intents'] = []
+            for x in self.intents:
+                bot_j['intents'].append({'intentName': x.name, 'intentVersion': x.version})
+        if self.clarification_prompt:
+            bot_j['clarificationPrompt'] = self.clarification_prompt.to_dict()
+        if self.abort_statement:
+            bot_j['abortStatement'] = self.abort_statement.to_dict()
+        bot_j['locale'] = self.locale
+        bot_j['childDirected'] = self.child_directed
+        self.bot_manager.upsert(bot_j)
+        return self

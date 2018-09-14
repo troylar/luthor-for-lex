@@ -2,6 +2,7 @@ class WithMessage:
     def __init__(self, **kwargs):
         self.group_number = kwargs.get('GroupNumber')
         self.max_attempts = kwargs.get('MaxAttempts')
+        self.response_card = kwargs.get('ResponseCard')
         self.messages = kwargs.get('Messages', [])
 
     def _to_message(self, content_type, content, group_number):

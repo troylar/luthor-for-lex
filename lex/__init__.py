@@ -124,6 +124,8 @@ class LexIntentManager:
             args[l] = intent[l]
             if 'slots' in list(intent.keys()):
                 for i in intent['slots']:
+                    if i['slotType'].startswith('AMAZON.'):
+                        continue
                     if 'slotTypeVersion' in list(i.keys()) and \
                             i['slotTypeVersion'] == '$LATEST':
                         print('Getting slot versions for ' + i['name'])
