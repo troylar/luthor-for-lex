@@ -208,6 +208,7 @@ class LexBotManager:
                 print(i['intentVersion'])
                 intents = self.client.get_intent_versions(
                     name=i['intentName'], maxResults=50)['intents']
+                print(intents)
                 if len(intents) > 0:
                     latestVersion = intents[len(intents)-1]['version']
                     print('Latest intent version = {}'.format(latestVersion))

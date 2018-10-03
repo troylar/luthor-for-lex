@@ -28,7 +28,7 @@ class FulfillmentActivity:
 
     def to_dict(self):
         data = {}
-        if 'codeHook' in data.keys():
+        if self.code_hook:
             data['codeHook'] = self.code_hook.to_dict()
         data['type'] = self.type
         return data
@@ -114,6 +114,8 @@ class IntentSlot(Slot):
             self.sample_utterances = kwargs.get('SampleUtterances')
         if 'response_card' not in self.__dict__.keys():
             self.response_card = kwargs.get('ResponseCard')
+        if 'enumeration_values' not in self.__dict__.keys():
+            self.enumeration_values = kwargs.get('EnumerationValues', [])
 
     def with_name(self, name):
         self.name = name
@@ -316,8 +318,8 @@ class Intent:
                 intent.with_intent_slot(s)
         if 'dialogCodeHook' in intent_j.keys():
             d = intent_j['dialogCodeHook']
-            intent.with_code_hook(DialogCodeHook(Uri=d['uri'],
-                                                 MessageVersion=d['messageVersion']))
+            intent.with_dialog_hook(DialogCodeHook(Uri=d['uri'],
+                                    MessageVersion=d['messageVersion']))
         if 'rejectionStatement' in intent_j.keys():
             r = WithMessage.from_json(intent_j['rejectionStatment'])
             intent.with_rejection_statement(r)
@@ -343,8 +345,8 @@ class Intent:
         if 'fulfillmentActivity' in intent_j.keys():
             f = FulfillmentActivity()
             f.with_type(intent_j['fulfillmentActivity']['type'])
-            if 'dialogCodeHook' in intent_j['fulfillmentActivity']:
-                d = intent_j['fulfillmentActivity']['dialogCodeHook']
+            if 'codeHook' in intent_j['fulfillmentActivity']:
+                d = intent_j['fulfillmentActivity']['codeHook']
                 f.with_code_hook(DialogCodeHook(Uri=d['uri'],
                                  MessageVersion=d['messageVersion']))
             intent.with_fulfillment_activity(f)
