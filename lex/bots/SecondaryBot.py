@@ -2,31 +2,31 @@ from lex.bots import BaseBot
 import arrow
 
 
-class PollexySecondaryBot(BaseBot):
+class SecondaryBot(BaseBot):
     def __init__(self, lexbot):
-        self.bot_name = 'PollexySecondaryBot'
+        self.bot_name = 'SecondaryBot'
         self.lexbot = lexbot
-        super(PollexySecondaryBot, self).__init__()
+        super().__init__()
 
     def on_fulfilled(self):
-        if self.lexbot.last_intent == 'PollexyWhatTimeIsItIntent':
+        if self.lexbot.last_intent == 'WhatTimeIsItIntent':
             now_local = arrow.utcnow().to('local')
             self.lexbot.output(Message='The time is {}. Today is {}.'
                                .format(now_local.format('hh:mm'),
                                        now_local.format('dddd, MM-DD-YYYY')))
 
-        if self.lexbot.last_intent == 'PollexyEmergencyIntent':
-            contact = self.lexbot.slots['PollexyEmergencyContactSlot']
+        if self.lexbot.last_intent == 'EmergencyIntent':
+            contact = self.lexbot.slots['EmergencyContactSlot']
             self.lexbot.output(
                 Message="I'm immediately sending a message to {}"
                         .format(contact))
-        super(PollexySecondaryBot, self).on_fulfilled()
+        super().on_fulfilled()
 
     def on_failed(self):
-        super(PollexySecondaryBot, self).on_failed()
+        super().on_failed()
 
     def on_transition_in(self):
-        if self.lexbot.last_intent == 'PollexyEmergencyIntent':
+        if self.lexbot.last_intent == 'EmergencyIntent':
             self.lexbot.output(Message="Let's get you some help")
         pass
 
@@ -43,4 +43,4 @@ class PollexySecondaryBot(BaseBot):
         pass
 
     def register(self):
-        super(PollexySecondaryBot, self).register()
+        super().register()

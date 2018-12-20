@@ -1,0 +1,24 @@
+SecondaryBot:
+  abortStatement:
+    messages:
+    - content: Sorry, I can't assist at this time!
+      contentType: PlainText
+  childDirected: false
+  clarificationPrompt:
+    maxAttempts: 3
+    messages:
+    - content: I didn't understand you, what would you like to do?
+      contentType: PlainText
+  description: Bot to handle emergency requests
+  idleSessionTTLInSeconds: 600
+  intents:
+  - intentName: WhatTimeIsItIntent 
+    intentVersion: '$LATEST'
+  - intentName: AnythingElseIntent
+    intentVersion: '$LATEST'
+  - intentName: EmergencyIntent
+    intentVersion: '$LATEST'
+  locale: en-US
+  name: SecondaryBot
+  voiceId: Salli
+

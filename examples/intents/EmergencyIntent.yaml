@@ -1,0 +1,31 @@
+EmergencyIntent:
+  confirmationPrompt:
+    maxAttempts: 1
+    messages:
+    - content: Okay, would you like me to contact {EmergencyContactSlot}
+      contentType: PlainText
+  description: Intent to handle emergency request
+  name: EmergencyIntent
+  fulfillmentActivity:
+      type: ReturnIntent
+  rejectionStatement:
+    messages:
+    - content: Okay, I will not contact your emergency contact.
+      contentType: PlainText
+  sampleUtterances:
+  - I need help.
+  - Something is wrong.
+  - Help please.
+  - I need to talk to someone.
+
+  slots:
+     - name: EmergencyContactSlot 
+       slotType: EmergencyContactSlotType
+       slotTypeVersion: '$LATEST'
+       slotConstraint: Required
+       valueElicitationPrompt:
+         messages:
+         - content: Who do you want me to contact?
+           contentType: PlainText
+         maxAttempts: 3
+

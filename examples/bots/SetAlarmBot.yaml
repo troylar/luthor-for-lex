@@ -9,12 +9,10 @@
      messages:
      - content: I didn't understand you, what would you like to do?
        contentType: PlainText
-   description: Bot to handle emergency requests
+   description: Bot to set alarm
    idleSessionTTLInSeconds: 600
    intents:
    - intentName: SetAlarmIntent
-     intentVersion: '$LATEST'
-   - intentName: AnythingElseIntent
      intentVersion: '$LATEST'
    locale: en-US
    name: SetAlarmBot

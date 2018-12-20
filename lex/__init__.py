@@ -104,8 +104,8 @@ class LexIntentManager:
 
     def create_version(self, intent):
         current_intent = self.get_intent(
-            intent['name'],
-            '$LATEST'
+            Name=intent['name'],
+            Version='$LATEST'
         )
         if current_intent:
             current_intent['checksum'] = current_intent['checksum']
@@ -502,13 +502,12 @@ class LexPlayer(object):
             self.bots_required = []
         self.bot_stack = []
         self.load_bots()
-        self.log = logging.getLogger("LexPlayer")
-        if os.environ.get('LOG_LEVEL') == 'DEBUG':
-            self.log.setLevel(logging.DEBUG)
+        self.log = kwargs.get('Logger', logging.getLogger())
         if introduction:
             self.active_bot.output(Message=introduction)
         if self.ice_breaker:
             self.send_response(self.ice_breaker, TextMode=True)
+        self.log.debug('Starting bot player')
 
     def add_to_history(self, **kwargs):
         b = LexBotHistoryItem()
@@ -546,7 +545,8 @@ class LexPlayer(object):
     def switch_bot(self, **kwargs):
         restart = bool(kwargs.get('Restart', False))
         if self.active_bot_name:
-            self.bot_stack.append(self.active_bot_name)
+            if not kwargs.get('Done', False):
+                self.bot_stack.append(self.active_bot_name)
             self.bots[self.active_bot_name].bot.on_transition_out()
         self.active_bot_name = kwargs.get('BotName')
         self.bots[self.active_bot_name].bot.on_transition_in()
@@ -615,15 +615,20 @@ class LexPlayer(object):
                                    TextMode=True)
             else:
                 self.log.debug('{} fulfilled.'.format(self.active_bot_name))
+                done = False
                 if len(self.bot_stack) > 0:
-                    self.switch_bot(BotName=self.bot_stack.pop(), Restart=True)
-                else:
+                    next_bot = self.bot_stack.pop()
+                    if next_bot == self.active_bot_name:
+                        done = True
+                    else:
+                        self.switch_bot(BotName=next_bot, Restart=False, Done=True)
+                if done:
                     done = True
                     if len(self.bots_required) > 0:
                         for b in self.bots_required:
                             if not self.bots[b].is_done:
                                 done = False
-                                self.switch_bot(BotName=b, Restart=True)
+                                self.switch_bot(BotName=b, Restart=False)
                                 break
                     if done and self.need_something_else:
                         self.active_bot.output(Message='How can I help you?')
