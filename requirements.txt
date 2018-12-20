@@ -2,7 +2,7 @@ arrow==0.12.1
 asn1crypto==0.24.0
 atomicwrites==1.2.1
 attrs==18.2.0
-aws-xray-sdk==2.2.0
+aws-xray-sdk==0.95
 bleach==3.0.2
 boto==2.49.0
 boto3==1.9.69
@@ -23,7 +23,7 @@ future==0.17.1
 idna==2.8
 Jinja2==2.10
 jmespath==0.9.3
-jsondiff==1.1.2
+jsondiff==1.1.1
 jsonpickle==1.0
 MarkupSafe==1.1.0
 mock==2.0.0
@@ -42,7 +42,7 @@ pygame==1.9.4
 Pygments==2.3.1
 pytest==4.0.2
 python-dateutil==2.7.5
-python-jose==3.0.1
+python-jose==3.0.0
 pytz==2018.7
 PyYAML==3.13
 readme-renderer==24.0
