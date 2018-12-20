@@ -1,11 +1,12 @@
+arrow==0.12.1
 asn1crypto==0.24.0
 atomicwrites==1.2.1
 attrs==18.2.0
-aws-xray-sdk==0.95
+aws-xray-sdk==2.2.0
 bleach==3.0.2
 boto==2.49.0
-boto3==1.9.67
-botocore==1.12.67
+boto3==1.9.69
+botocore==1.12.69
 certifi==2018.11.29
 cffi==1.11.5
 chardet==3.0.4
@@ -22,8 +23,9 @@ future==0.17.1
 idna==2.8
 Jinja2==2.10
 jmespath==0.9.3
-jsondiff==1.1.1
+jsondiff==1.1.2
 jsonpickle==1.0
+-e git+git@github.com:troylar/luthor-for-lex.git@e7245b11e1ffbc256ae17f0b9c3a5fd5a608979b#egg=luthor_for_lex
 MarkupSafe==1.1.0
 mock==2.0.0
 more-itertools==4.3.0
