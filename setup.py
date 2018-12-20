@@ -13,7 +13,7 @@ setuptools.setup(
     author_email="troylar@gmail.com",
     description="Easy Lex bot manager",
     long_description=long_description,
-    long_description_content_type="text/markdown",
+    install_requires=required,
     url="https://github.com/troylar/luthor-for-lex",
     packages=["speaker", "lex", "cli", "lex.fluent"],
     classifiers=[

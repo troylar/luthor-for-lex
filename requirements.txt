@@ -25,7 +25,6 @@ Jinja2==2.10
 jmespath==0.9.3
 jsondiff==1.1.2
 jsonpickle==1.0
--e git+git@github.com:troylar/luthor-for-lex.git@e7245b11e1ffbc256ae17f0b9c3a5fd5a608979b#egg=luthor_for_lex
 MarkupSafe==1.1.0
 mock==2.0.0
 more-itertools==4.3.0
