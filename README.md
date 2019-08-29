@@ -14,3 +14,46 @@ For example, in the case of someone with special needs, a person may be in the m
 * Customizable transitions between bots to provide a natural conversation flow
 * Built-in bot player, using audio or keyboard entry
 
+ #Installation
+
+```
+$ pip install luthor-for-lex
+```
+
+# Feature #1: Bot Management
+To manage bots, you can look at the `examples` folder to see the format. Basically, it the Lex schema in yaml. You separately deploy slots, intents and bots. All three use the same format:
+
+If the item doesn't exist, it will create it. If there are changes, then it will automatically update the current entity in Lex.
+
+```
+$ luthor bot/intent/slot apply {folder containing yaml}
+```
+
+## Deploying Slots
+
+```
+$ luthor slot apply ./example/slots
+```
+
+## Deploying Intents
+
+```
+$ luthor intent apply ./example/intents
+```
+
+## Deploying Bots
+
+```
+$ luthor intent apply ./example/bots
+```
+
+# Feature #2: Bot Player
+If you want to test our your bot from the command-line, `luthor` will let you interact with your bot either via audio or keyboard.
+
+Suppose you have a bot named `SetAlarmBot` with an utterance `Set my alarm.`
+
+```
+$ luthor play SetAlarmBot --ice_breaker "Set my alarm." --required_bots SetAlarmBot --no_audio
+```
+
+The `ice_breaker` is the utterance that initates the bot. This will allow you to interact with the bot via keyboard for testing.
