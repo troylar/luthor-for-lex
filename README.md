@@ -48,7 +48,7 @@ $ luthor bot apply ./example/bots
 ```
 
 # Feature #2: Bot Player
-If you want to test our your bot from the command-line, `luthor` will let you interact with your bot either via audio or keyboard.
+If you want to test out your bot from the command-line, `luthor` will let you interact with your bot either via audio or keyboard.
 
 Suppose you have a bot named `SetAlarmBot` with an utterance `Set my alarm.`
 
