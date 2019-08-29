@@ -44,7 +44,7 @@ $ luthor intent apply ./example/intents
 ## Deploying Bots
 
 ```
-$ luthor intent apply ./example/bots
+$ luthor bot apply ./example/bots
 ```
 
 # Feature #2: Bot Player
