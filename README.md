@@ -14,5 +14,3 @@ For example, in the case of someone with special needs, a person may be in the m
 * Customizable transitions between bots to provide a natural conversation flow
 * Built-in bot player, using audio or keyboard entry
 
-# Cre
-
