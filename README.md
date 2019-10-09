@@ -57,3 +57,25 @@ $ luthor play SetAlarmBot --ice_breaker "Set my alarm." --required_bots SetAlarm
 ```
 
 The `ice_breaker` is the utterance that initates the bot. This will allow you to interact with the bot via keyboard for testing.
+
+# Feature #3: Multiple Bots
+Using multiple bots allows you to pass in multiple bots to the player and interact with multiple utterances across all of the bots. This lets you modularize your bots.
+
+## Step 1: Create and deploy your bot
+Create the yaml and deploy your complete bot.
+
+## Step 2: Create the bots folder
+If it doesn't exist, create a `./lex/bots` folder.
+
+## Step 3: Create a bot class
+Create a new file in the `./lex/bots` folder called `{botname}.py` inheriting from `BaseBot`.
+
+For example, if you bot is called `OrderPizza`, then create a file called `./lex/bots/OrderPizza.py`:
+
+```
+class OrderPizza(BaseBot):
+     def __init__(self, lexbot):
+         self.bot_name = 'PizzaBot'
+         self.lexbot = lexbot
+         super().__init__()
+```
