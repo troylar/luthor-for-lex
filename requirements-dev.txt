@@ -15,7 +15,7 @@ mock==3.0.5
 pipreqs==0.4.9
 pkginfo==1.5.0.1
 pygame==1.9.6
-Pygments==2.4.2
+Pygments==2.7.4
 python-dateutil==2.8.0
 PyYAML==5.1.2
 readme-renderer==24.0
