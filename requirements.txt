@@ -1,6 +1,6 @@
 sure==1.4.11
 Click==7.0
-setuptools==40.8.0
+setuptools==65.5.1
 pygame==1.9.6
 boto3==1.9.246
 botocore==1.12.246
